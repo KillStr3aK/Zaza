@@ -33,13 +33,5 @@
 
             ZazaConsole.WriteLine($"Registered <color=yellow>{ZazaConsole.Commands.Count}</color> commands.");
         }
-
-        void Update()
-        {
-            if(Input.GetKeyDown(KeyCode.Insert))
-            {
-
-            }
-        }
     }
 }
