@@ -1,6 +1,7 @@
 ﻿namespace Zaza
 {
     using System;
+    using System.IO;
     using System.Collections.Generic;
 
     using UnityEngine;
@@ -29,69 +30,49 @@
             }
         }
 
-        public static void RunScript(ConsoleEventArgs args)
+        public static void LoadScript(ConsoleEventArgs args)
         {
-            if (args.Length != 3)
+            if (args.Length != 2)
             {
-                args.ReplyError("Syntax Error: /run_script [name] [filepath]");
+                args.ReplyError("Syntax Error: /load_script [filename]");
                 return;
             }
 
-            string name = args[1].ToString();
-            string filepath = args[2].ToString();
-
-            args.Reply($"{name} {filepath}");
+            string path = "\\Zaza\\Scripts\\" + args[1].ToString() + ".dll";
 
             try
             {
-                args.Reply($"Creating scripting environment for {name}");
-                /*
-                ScriptContext<object> ctx = ScriptingEnvironment.Create(name, filepath);
-                {
-                    args.Reply($"Compiling {name}...");
-
-                    ctx.Compile();
-
-                    args.Reply($"Running {name}...");
-                    ctx.RunAsync();
-                }
-                */
-            }
-            catch (Exception ex)
+                ScriptHandler.LoadScript(path);
+            } catch (FileNotFoundException ex)
+            {
+                args.ReplyError(ex.Message);
+            } catch (BadImageFormatException ex)
+            {
+                args.ReplyError(ex.Message);
+            } catch (Exception ex)
             {
                 ZazaConsole.Exception(ex);
             }
         }
 
-        public static void RunLua(ConsoleEventArgs args)
+        public static void UnloadScript(ConsoleEventArgs args)
         {
-            if (args.Length != 3)
+            if (args.Length != 2)
             {
-                args.ReplyError("Syntax Error: /run_script [name] [filepath]");
+                args.ReplyError("Syntax Error: /unload_script [filename]");
                 return;
             }
 
-            string name = args[1].ToString();
-            string filepath = args[2].ToString();
-
-            args.Reply($"{name} {filepath}");
+            string path = "\\Zaza\\Scripts\\" + args[1].ToString() + ".dll";
 
             try
             {
-                args.Reply($"Creating scripting environment for {name}");
-                /*
-                using (Lua state = new Lua())
-                {
-                    object[] results = state.DoFile(filepath);
-
-                    foreach (var result in results)
-                    {
-                        ZazaConsole.WriteLine($"{result}");
-                    }
-                }
-                */
+                ScriptHandler.UnloadScript(path);
             }
-            catch (Exception ex)
+            catch (FileNotFoundException ex)
+            {
+                args.ReplyError(ex.Message);
+            } catch (Exception ex)
             {
                 ZazaConsole.Exception(ex);
             }

@@ -21,24 +21,50 @@
             }
 
             string[] files = Directory.GetFiles(directoryPath);
+
             if(files.Length == 0)
             {
                 return;
             }
 
             ZazaConsole.WriteLine("Loading scripts..");
+
             foreach (string filePath in files)
             {
-                if (!filePath.EndsWith(".dll"))
-                    continue;
+                ScriptHandler.LoadScript(filePath);
+            }
+        }
 
-                string scriptName = Path.GetFileNameWithoutExtension(filePath);
-                ZazaConsole.WriteLine($"Creating script environment for {scriptName}");
+        public static void LoadScript(string scriptFile)
+        {
+            if (!File.Exists(scriptFile))
+                throw new FileNotFoundException("File not found at given path.");
 
-                ScriptRuntime scriptRuntime = new ScriptRuntime();
-                scriptRuntime.Create();
-                scriptRuntime.SetScriptName(scriptName);
-                scriptRuntime.RunScript(filePath);
+            if (!scriptFile.EndsWith(".dll"))
+            {
+                throw new BadImageFormatException("File is not a class library.");
+            }
+
+            string scriptName = Path.GetFileNameWithoutExtension(scriptFile);
+            ZazaConsole.WriteLine($"Creating script environment for {scriptName}");
+
+            ScriptRuntime scriptRuntime = new ScriptRuntime();
+            scriptRuntime.Create();
+            scriptRuntime.SetScriptName(scriptName);
+            scriptRuntime.RunScript(scriptFile);
+        }
+
+        public static void UnloadScript(string scriptFile)
+        {
+            string scriptName = Path.GetFileNameWithoutExtension(scriptFile);
+            Script script = ScriptManager.GetScripts().Find(x => x.Context.GetName() == scriptName);
+
+            if(script != null)
+            {
+                ScriptHandler.UnloadScript(script.Context.ScriptManager.GetScriptRuntime());
+            } else
+            {
+                throw new FileNotFoundException("File not found at given path.");
             }
         }
 
@@ -52,6 +78,9 @@
 
                     scriptRuntime.Dispose();
                     scriptRuntime = null;
+                } else
+                {
+                    ZazaConsole.Error("Invalid ScriptRuntime instance");
                 }
             } catch (Exception ex)
             {
@@ -63,7 +92,7 @@
         {
             var runtimes = ScriptRuntime.GetScriptRuntimes();
 
-            foreach(var runtime in runtimes)
+            foreach (var runtime in runtimes)
             {
                 ScriptHandler.UnloadScript(runtime.Value);
             }
@@ -102,7 +131,7 @@
                 this.ScriptManager = (ScriptManager)this.AppDomain.CreateInstanceAndUnwrap(typeof(ScriptManager).Assembly.FullName, typeof(ScriptManager).FullName);
                 */
 
-                this.ScriptManager = new ScriptManager();
+                this.ScriptManager = new ScriptManager(this);
                 ScriptRuntimes.Add(this.InstanceID, this);
             } catch (Exception ex)
             {
@@ -140,10 +169,14 @@
         {
             // AppDomain.Unload(this.AppDomain);
 
-            this.AppDomain = null;
-            this.ScriptManager = null;
+            if(this.IsValid())
+            {
+                this.AppDomain = null;
+                this.ScriptManager = null;
+            }
 
-            ScriptRuntimes.Remove(this.InstanceID);
+            if(ScriptRuntimes.ContainsKey(this.InstanceID))
+                ScriptRuntimes.Remove(this.InstanceID);
         }
     }
 
@@ -153,17 +186,25 @@
 
         private static Dictionary<string, Assembly> Assemblies { get; set; } = new Dictionary<string, Assembly>();
 
+        private readonly int InstanceID;
+
+        private static readonly Random Random = new Random();
+
+        private ScriptRuntime ScriptRuntime;
+
         // actually, domain-global
         // internal static ScriptManager GlobalManager { get; set; }
 
-        public ScriptManager()
+        public ScriptManager(ScriptRuntime scriptRuntime)
         {
+            this.InstanceID = Random.Next();
+            this.ScriptRuntime = scriptRuntime;
             // GlobalManager = this;
 
             Thread.CurrentThread.CurrentCulture = CultureInfo.InvariantCulture;
             Thread.CurrentThread.CurrentUICulture = CultureInfo.InvariantCulture;
 
-            AppDomain.CurrentDomain.UnhandledException += (s, args) => { ZazaConsole.Exception(args.ExceptionObject as Exception); };
+            AppDomain.CurrentDomain.UnhandledException += (s, args) => { ZazaConsole.Exception(args.ExceptionObject as ScriptException); };
             AppDomain.CurrentDomain.AssemblyResolve += (s, args) =>
             {
                 if (Assemblies.ContainsKey(args.Name))
@@ -171,11 +212,11 @@
                     return Assemblies[args.Name];
                 }
 
-                return LoadScriptInternal(args.Name.Split(',')[0]);
+                return this.LoadScript(args.Name.Split(',')[0]);
             };
         }
 
-        private static Assembly CreateScriptInternal(string assemblyFile)
+        private static Assembly CreateScriptInternal(ScriptManager scriptManager, string assemblyFile)
         {
             if(Assemblies.ContainsKey(assemblyFile))
             {
@@ -199,22 +240,27 @@
                 ZazaConsole.WriteLine($"Loaded {assembly.FullName} into {AppDomain.CurrentDomain.FriendlyName}");
                 definedTypes = assembly.GetTypes().Where(predicate);
 
-                foreach (Type type in definedTypes)
+                if (definedTypes.Count() != 0)
                 {
-                    try
+                    foreach (Type type in definedTypes)
                     {
-                        ZazaConsole.WriteLine($"Instantiating script instance.. {type.FullName}");
+                        try
+                        {
+                            ZazaConsole.WriteLine($"Instantiating script instance.. {type.FullName}");
 
-                        Script derivedScript = Activator.CreateInstance(type) as Script;
-                        derivedScript.Context = new ScriptContext(assembly);
+                            Script derivedScript = Activator.CreateInstance(type) as Script;
+                            derivedScript.Context = new ScriptContext(assembly, scriptManager);
 
-                        AddScript(derivedScript);
+                            AddScript(derivedScript);
+                        } catch (Exception ex)
+                        {
+                            ZazaConsole.Error($"Failed to instantiate instance of script {assemblyName}");
+                            ZazaConsole.Exception(ex);
+                        }
                     }
-                    catch (Exception ex)
-                    {
-                        ZazaConsole.Error($"Failed to instantiate instance of script {assemblyName}");
-                        ZazaConsole.Exception(ex);
-                    }
+                } else
+                {
+                    throw new ScriptException("Library does not contains any class that inherits from Script.");
                 }
             } catch (Exception ex)
             {
@@ -226,11 +272,11 @@
         }
 
 #nullable enable
-        private static Assembly? LoadScriptInternal(string assemblyFile)
+        private static Assembly? LoadScriptInternal(ScriptManager scriptManager, string assemblyFile)
         {
             try
             {
-                return CreateScriptInternal(assemblyFile);
+                return scriptManager.CreateScript(assemblyFile);
             } catch (Exception ex)
             {
                 ZazaConsole.Exception(ex);
@@ -240,11 +286,14 @@
         }
 #nullable disable
 
-        internal void CreateScript(string scriptFile)
-            => CreateScriptInternal(scriptFile);
+        internal Assembly CreateScript(string scriptFile)
+            => CreateScriptInternal(this, scriptFile);
 
-        internal void LoadScript(string scriptFile)
-            => LoadScriptInternal(scriptFile);
+        internal Assembly LoadScript(string scriptFile)
+            => LoadScriptInternal(this, scriptFile);
+
+        internal int GetInstanceID()
+            => this.InstanceID;
 
         internal static void AddScript(Script script)
         {
@@ -265,11 +314,14 @@
         internal static List<Script> GetScripts()
             => ScriptManager.Scripts;
 
+        internal ScriptRuntime GetScriptRuntime()
+            => this.ScriptRuntime;
+
         public void Tick()
         {
             foreach(Script script in Scripts)
             {
-                
+                script.OnTick();
             }
         }
     }
@@ -280,10 +332,14 @@
 
         internal AssemblyName AssemblyName { get; set; } = null;
 
-        public ScriptContext(Assembly assembly)
+        internal ScriptManager ScriptManager { get; set; } = null;
+
+        public ScriptContext(Assembly assembly, ScriptManager scriptManager)
         {
             this.Assembly = assembly;
             this.AssemblyName = assembly.GetName();
+
+            this.ScriptManager = scriptManager;
         }
 
         public string GetName()
@@ -296,6 +352,9 @@
 
         protected Player LocalPlayer
             => Game.GetLocalPlayer();
+
+        public virtual void OnTick()
+            { }
 
         protected string GetScriptName()
             => this.Context.GetName();

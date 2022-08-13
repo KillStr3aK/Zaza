@@ -61,7 +61,7 @@
   <ItemGroup>
     <Compile Include="Commands.cs" />
     <Compile Include="Misc\Pumped.cs" />
-    <Compile Include="Models\Exceptions\PluginException.cs" />
+    <Compile Include="Models\Exceptions\ScriptException.cs" />
     <Compile Include="Models\Exceptions\NotInGameException.cs" />
     <Compile Include="Models\Extensions\ConsoleEventArgsExtensions.cs" />
     <Compile Include="Models\Extensions\PlayerExtensions.cs" />

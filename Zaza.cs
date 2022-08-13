@@ -35,9 +35,7 @@
 
             ZazaConsole.RegisterCommand("prefab_dump", "[(Optional)filepath] Dump game prefabs.", Commands.PrefabDump);
 
-            ZazaConsole.RegisterCommand("run_script", "[name] [filepath] Run script.", Commands.RunScript);
-
-            ZazaConsole.RegisterCommand("run_lua", "[name] [filepath] Run Lua script.", Commands.RunLua);
+            ZazaConsole.RegisterCommand("load_script", "[filename] Run C# script.", Commands.LoadScript);
 
             ZazaConsole.RegisterCommand("unlockdlc", "[(Optional)dlcname] Soft-Unlock the given DLC.", Commands.UnlockDLC);
 
