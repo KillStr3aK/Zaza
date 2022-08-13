@@ -67,6 +67,8 @@
     <Compile Include="Models\Extensions\ConsoleEventArgsExtensions.cs" />
     <Compile Include="Models\Extensions\PlayerExtensions.cs" />
     <Compile Include="Models\Extensions\TerminalExtensions.cs" />
+    <Compile Include="Models\SDK\Game.cs" />
+    <Compile Include="Models\SDK\HUD.cs" />
     <Compile Include="Models\SDK\PrefabList.cs" />
     <Compile Include="Models\SDK\PrefabManager.cs" />
     <Compile Include="Models\ScriptingEnvironment.cs" />

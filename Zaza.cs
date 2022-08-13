@@ -7,7 +7,6 @@
     using UnityEngine;
 
     using global::Zaza.SDK;
-    using static MessageHud;
 
     internal sealed partial class Zaza : MonoBehaviour
     {
@@ -168,7 +167,7 @@
 
             ZazaConsole.RegisterCommand("prefab_spawn", "[name] [amount] [level] Spawn any game prefab. (Items, mobs, etc.)", (args) =>
             {
-                Player localPlayer = GetLocalPlayer();
+                Player localPlayer = Game.GetLocalPlayer();
 
                 if (localPlayer == null)
                 {
@@ -230,7 +229,7 @@
 
             ZazaConsole.RegisterCommand("kill_animals", "[distance] [(Optional)maxamount] Kill entities", (args) =>
             {
-                Player localPlayer = GetLocalPlayer();
+                Player localPlayer = Game.GetLocalPlayer();
 
                 if (localPlayer == null)
                 {
@@ -262,7 +261,7 @@
 
                 try
                 {
-                    result = KillMobs(distance, maxAmount);
+                    result = Game.KillMobs(distance, maxAmount);
                 } catch (Exception ex)
                 {
                     ZazaConsole.Exception(ex);
@@ -280,66 +279,6 @@
             {
 
             }
-        }
-
-        /// <summary>
-        /// Get local <see cref="Player"/> instance.
-        /// </summary>
-        /// <returns>Local <see cref="Player"/> instance</returns>
-#nullable enable
-        public static Player? GetLocalPlayer()
-            => Player.m_localPlayer;
-#nullable disable
-
-        public static void ShowBiomeFoundMsg(string text, bool playStinger = false)
-        {
-            if (GetLocalPlayer() != null)
-            {
-                MessageHud.instance.ShowBiomeFoundMsg(text, playStinger);
-            }
-        }
-
-        public static void ShowMessage(MessageType type, string text, int amount = 0, Sprite icon = null)
-        {
-            if (GetLocalPlayer() != null)
-            {
-                MessageHud.instance.ShowMessage(type, text, amount, icon);
-            }
-        }
-
-        public static void MessageAll(MessageType type, string text)
-        {
-            if (GetLocalPlayer() != null)
-            {
-                MessageHud.instance.MessageAll(type, text);
-            }
-        }
-
-        public static int KillMobs(float maxDistance, int maxAmount = -1)
-        {
-            Player localPlayer = GetLocalPlayer();
-
-            int amount = 0;
-            List<Character> characters = Character.GetAllCharacters();
-            HitData hit = new HitData();
-            hit.m_damage.m_damage = 9999.9f;
-
-            foreach(Character character in characters)
-            {
-                if (character.IsPlayer())
-                    continue;
-
-                if (Vector3.Distance(localPlayer.transform.position, character.transform.position) > maxDistance)
-                    continue;
-
-                localPlayer.Attack(character, hit);
-                ++amount;
-
-                if (maxAmount != -1 && amount == maxAmount)
-                    break;
-            }
-
-            return amount;
         }
     }
 }
