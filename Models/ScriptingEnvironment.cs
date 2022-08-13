@@ -2,89 +2,323 @@
 {
     using System;
     using System.IO;
+    using System.Linq;
+    using System.Threading;
     using System.Reflection;
+    using System.Globalization;
     using System.Collections.Generic;
 
-    using Nexd.Reflection;
+    using global::Zaza.SDK;
 
-    internal static class PluginManager
+    internal class ScriptHandler
     {
-        private static AppDomain AppDomain { get; set; }
-
-        private static Dictionary<string, ZazaPlugin> Plugins { get; set; } = new Dictionary<string, ZazaPlugin>();
-
-        public static void CreateEnvironment()
-            => AppDomain = AppDomain.CurrentDomain;
-
-        public static void LoadPlugins()
+        public static void LoadScriptsFromDirectory(string directoryPath)
         {
-            if (!Directory.Exists("Zaza"))
+            if (!Directory.Exists(directoryPath))
+            {
+                ZazaConsole.WriteLine("Folder not found.");
+                return;
+            }
+
+            string[] files = Directory.GetFiles(directoryPath);
+            if(files.Length == 0)
             {
                 return;
             }
 
-            foreach (string filePath in Directory.GetFiles("Zaza"))
+            ZazaConsole.WriteLine("Loading scripts..");
+            foreach (string filePath in files)
             {
-                ZazaConsole.WriteLine($"Loading plugin from {filePath}...");
-                Assembly assembly = Assembly.LoadFrom(filePath);
-                AssemblyName assemblyName = assembly.GetName();
-                Plugins[assemblyName.Name] = new ZazaPlugin(assembly, assemblyName);
+                if (!filePath.EndsWith(".dll"))
+                    continue;
+
+                string scriptName = Path.GetFileNameWithoutExtension(filePath);
+                ZazaConsole.WriteLine($"Creating script environment for {scriptName}");
+
+                ScriptRuntime scriptRuntime = new ScriptRuntime();
+                scriptRuntime.Create();
+                scriptRuntime.SetScriptName(scriptName);
+                scriptRuntime.RunScript(filePath);
+            }
+        }
+
+        public static void UnloadScript(ScriptRuntime scriptRuntime)
+        {
+            try
+            {
+                if (scriptRuntime != null)
+                {
+                    ZazaConsole.WriteLine($"Unloading script {scriptRuntime.GetScriptName()}");
+
+                    scriptRuntime.Dispose();
+                    scriptRuntime = null;
+                }
+            } catch (Exception ex)
+            {
+                ZazaConsole.Exception(ex);
+            }
+        }
+
+        public static void UnloadScripts()
+        {
+            var runtimes = ScriptRuntime.GetScriptRuntimes();
+
+            foreach(var runtime in runtimes)
+            {
+                ScriptHandler.UnloadScript(runtime.Value);
             }
         }
     }
 
-    public enum PluginState : uint
+    internal class ScriptRuntime : IDisposable
     {
-        Unknown = 0x0,
+        private static Dictionary<int, ScriptRuntime> ScriptRuntimes { get; set; } = new Dictionary<int, ScriptRuntime>();
 
-        Loading = 0x1,
+        private ScriptManager ScriptManager { get; set; }
 
-        Failed = 0x2,
+        private static readonly Random Random = new Random();
 
-        Loaded = 0x3
+        private readonly int InstanceID;
+
+        private string Name { get; set; }
+
+        private AppDomain AppDomain { get; set; }
+
+        static ScriptRuntime()
+            { }
+
+        internal ScriptRuntime()
+            => this.InstanceID = Random.Next();
+
+        internal int GetInstanceID()
+            => this.InstanceID;
+
+        internal void Create()
+        {
+            try
+            {
+                /* Unity does not really likes multiple domains
+                this.AppDomain = AppDomain.CreateDomain($"ScriptDomain_{this.GetInstanceID()}", AppDomain.CurrentDomain.Evidence, new AppDomainSetup() { ApplicationBase = AppDomain.CurrentDomain.BaseDirectory });
+                this.ScriptManager = (ScriptManager)this.AppDomain.CreateInstanceAndUnwrap(typeof(ScriptManager).Assembly.FullName, typeof(ScriptManager).FullName);
+                */
+
+                this.ScriptManager = new ScriptManager();
+                ScriptRuntimes.Add(this.InstanceID, this);
+            } catch (Exception ex)
+            {
+                ZazaConsole.Exception(ex);
+            }
+        }
+
+        internal void SetScriptName(string name)
+            => this.Name = name;
+
+        internal string GetScriptName()
+            => this.Name;
+
+        internal bool IsValid()
+            => this.AppDomain != null && this.ScriptManager != null;
+
+        internal void RunScript(string scriptFile)
+        {
+            try
+            {
+                this.ScriptManager.LoadScript(scriptFile);
+            } catch (Exception ex)
+            {
+                ZazaConsole.Exception(ex);
+            }
+        }
+
+        internal static Dictionary<int, ScriptRuntime> GetScriptRuntimes()
+            => ScriptRuntime.ScriptRuntimes;
+
+        internal ScriptManager GetScriptManager()
+            => this.ScriptManager;
+
+        public void Dispose()
+        {
+            AppDomain.Unload(this.AppDomain);
+
+            this.AppDomain = null;
+            this.ScriptManager = null;
+
+            ScriptRuntimes.Remove(this.InstanceID);
+        }
     }
 
-    public class ZazaPlugin
+    internal class ScriptManager : MarshalByRefObject
     {
-        internal Assembly Assembly { get; set; }
+        private static readonly List<Script> Scripts = new List<Script>();
 
-        internal AssemblyName AssemblyName { get; set; }
+        private static Dictionary<string, Assembly> Assemblies { get; set; } = new Dictionary<string, Assembly>();
 
-        public PluginState State { get; set; } = PluginState.Unknown;
+        // actually, domain-global
+        // internal static ScriptManager GlobalManager { get; set; }
 
-        internal ZazaPlugin(Assembly assembly, AssemblyName assemblyName)
+        public ScriptManager()
+        {
+            // GlobalManager = this;
+
+            Thread.CurrentThread.CurrentCulture = CultureInfo.InvariantCulture;
+            Thread.CurrentThread.CurrentUICulture = CultureInfo.InvariantCulture;
+
+            AppDomain.CurrentDomain.UnhandledException += (s, args) => { ZazaConsole.Exception(args.ExceptionObject as Exception); };
+            AppDomain.CurrentDomain.AssemblyResolve += (s, args) =>
+            {
+                if (Assemblies.ContainsKey(args.Name))
+                {
+                    return Assemblies[args.Name];
+                }
+
+                return LoadScriptInternal(args.Name.Split(',')[0]);
+            };
+        }
+
+        private static Assembly CreateScriptInternal(string assemblyFile)
+        {
+            if(Assemblies.ContainsKey(assemblyFile))
+            {
+                ZazaConsole.WriteLine($"Returning previously loaded assembly {Assemblies[assemblyFile].FullName}");
+                return Assemblies[assemblyFile];
+            }
+
+            Assembly assembly = null;
+            string assemblyName = Path.GetFileNameWithoutExtension(assemblyFile);
+
+            Func<Type, bool> predicate = (t =>
+                t != null && !t.IsAbstract && t.IsSubclassOf(typeof(Script)) && t.GetConstructor(Type.EmptyTypes) != null);
+
+            IEnumerable<Type> definedTypes;
+
+            try
+            {
+                assembly = Assembly.LoadFile(assemblyFile);
+                Assemblies[assemblyFile] = assembly;
+
+                ZazaConsole.WriteLine($"Loaded {assembly.FullName} into {AppDomain.CurrentDomain.FriendlyName}");
+                definedTypes = assembly.GetTypes().Where(predicate);
+
+                foreach (Type type in definedTypes)
+                {
+                    try
+                    {
+                        ZazaConsole.WriteLine($"Instantiating script instance.. {type.FullName}");
+
+                        Script derivedScript = Activator.CreateInstance(type) as Script;
+                        derivedScript.Context = new ScriptContext(assembly);
+
+                        AddScript(derivedScript);
+                    }
+                    catch (Exception ex)
+                    {
+                        ZazaConsole.Error($"Failed to instantiate instance of script {assemblyName}");
+                        ZazaConsole.Exception(ex);
+                    }
+                }
+            } catch (Exception ex)
+            {
+                ZazaConsole.Error($"Failed to load Assembly {assemblyName}");
+                ZazaConsole.Exception(ex);
+            }
+
+            return assembly;
+        }
+
+#nullable enable
+        private static Assembly? LoadScriptInternal(string assemblyFile)
+        {
+            try
+            {
+                return CreateScriptInternal(assemblyFile);
+            } catch (Exception ex)
+            {
+                ZazaConsole.Exception(ex);
+            }
+
+            return null;
+        }
+#nullable disable
+
+        internal void CreateScript(string scriptFile)
+            => CreateScriptInternal(scriptFile);
+
+        internal void LoadScript(string scriptFile)
+            => LoadScriptInternal(scriptFile);
+
+        internal static void AddScript(Script script)
+        {
+            if (!Scripts.Contains(script))
+            {
+                Scripts.Add(script);
+            }
+        }
+
+        internal static void RemoveScript(Script script)
+        {
+            if (Scripts.Contains(script))
+            {
+                Scripts.Remove(script);
+            }
+        }
+
+        internal static List<Script> GetScripts()
+            => ScriptManager.Scripts;
+
+        public void Tick()
+        {
+            foreach(Script script in Scripts)
+            {
+                
+            }
+        }
+    }
+
+    internal class ScriptContext
+    {
+        internal Assembly Assembly { get; set; } = null;
+
+        internal AssemblyName AssemblyName { get; set; } = null;
+
+        public ScriptContext(Assembly assembly)
         {
             this.Assembly = assembly;
-            this.AssemblyName = assemblyName;
-
-            this.Initialize();
+            this.AssemblyName = assembly.GetName();
         }
 
         public string GetName()
             => this.AssemblyName.Name;
+    }
 
-#nullable enable
-        internal void Initialize()
-        {
-            this.State = PluginState.Loading;
+    public abstract class Script
+    {
+        internal ScriptContext Context { get; set; } = null;
 
-            Type? type = Pumped.FindDerivedType(this.Assembly, typeof(ZazaPlugin));
-            if(type == null)
-            {
-                this.State = PluginState.Failed;
-                throw new PluginException($"Plugin {this.GetName()} does not have any class that inherits from 'ZazaPlugin'.");
-            }
+        protected Player LocalPlayer
+            => Game.GetLocalPlayer();
 
-            MethodInfo? methodInfo = type.GetMethod("OnPluginStart");
-            if(methodInfo == null)
-            {
-                this.State = PluginState.Failed;
-                throw new PluginException($"Plugin {this.GetName()} does not implement OnPluginStart method.");
-            }
+        protected string GetScriptName()
+            => this.Context.GetName();
 
-            object instance = Activator.CreateInstance(type);
-            this.State = (PluginState)methodInfo.Invoke(instance, null);
-        }
-#nullable disable
+        /// <inheritdoc cref="ZazaConsole.WriteLine"/>
+        protected void Log(string text)
+            => ZazaConsole.WriteLine($"script: {this.GetScriptName()} " + text);
+
+        /// <inheritdoc cref="ZazaConsole.WriteLine"/>
+        protected void Error(string text)
+            => ZazaConsole.Error($"script: {this.GetScriptName()} " + text);
+
+        /// <summary>
+        /// Prints exception to console.
+        /// </summary>
+        /// <param name="ex">Thrown exception.</param>
+        protected void Exception(Exception ex)
+            => ZazaConsole.Exception(ex);
+
+        public static void RegisterScript(Script script)
+            => ScriptManager.AddScript(script);
+
+        public static void UnregisterScript(Script script)
+            => ScriptManager.RemoveScript(script);
     }
 }

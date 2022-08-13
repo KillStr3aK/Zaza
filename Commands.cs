@@ -12,7 +12,7 @@
     {
         public static void PrefabDump(ConsoleEventArgs args)
         {
-            string path = AppDomain.CurrentDomain.BaseDirectory;
+            string path = AppDomain.CurrentDomain.BaseDirectory + "\\Zaza";
 
             if (args.Length == 2)
             {

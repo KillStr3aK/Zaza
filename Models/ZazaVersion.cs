@@ -3,7 +3,7 @@
     using Nexd.Reflection;
     using System.Reflection;
 
-    internal sealed class ZazaVersion
+    public sealed class ZazaVersion
     {
         public static string GetCheatVersion()
             => "1.0";

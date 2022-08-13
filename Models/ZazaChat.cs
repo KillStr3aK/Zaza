@@ -4,7 +4,7 @@
 
     using Nexd.Reflection;
 
-    internal sealed class ZazaChat : ZazaTerminal
+    public sealed class ZazaChat : ZazaTerminal
     {
         /// <summary>
         /// Gets the in-game <see cref="Chat.instance"/>.

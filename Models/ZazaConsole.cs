@@ -5,7 +5,7 @@
 
     using static Terminal;
 
-    internal sealed class ZazaConsole : ZazaTerminal
+    public sealed class ZazaConsole : ZazaTerminal
     {
         /// <summary>
         /// Dictionary that contains commands that has been registered by the cheat.
@@ -119,18 +119,27 @@
         /// <para><![CDATA[ <color=#FC0303>text</color> ]]></para>
         /// </param>
         public static void WriteLine(string text)
-            => Console.instance.Print($"<color=#73fc03>[ZAZA]</color> {text}");
+            => Console.instance.Print($"<color=#42F5A7>[ZAZA]</color> {text}");
 
         /// <inheritdoc cref="ZazaConsole.WriteLine"/>
         public static void Error(string text)
-            => Console.instance.Print($"<color=#73fc03>[ZAZA]</color> <color=red>[ERROR]</color> {text}");
+            => Console.instance.Print($"<color=#42F5A7>[ZAZA]</color> <color=red>[ERROR]</color> {text}");
 
         /// <summary>
         /// Prints exception to console.
         /// </summary>
         /// <param name="ex">Thrown exception.</param>
         public static void Exception(System.Exception ex)
-            => Error($"{ex.Message}\n{ex.StackTrace}");
+        {
+            Error($"<color=#7734eb>{ex.Source}</color>::<color=#3493eb>{ex.GetType().Name}</color> => <color=#3493eb>{ex.Message}</color>\n<color=yellow>{ex.StackTrace}</color>");
+            UnityEngine.Debug.Log($"{ex.Source}::{ex.GetType().Name} => {ex.Message}\n{ex.StackTrace}");
+
+            if (ex.InnerException != null)
+            {
+                Error($"<color=#7734eb>{ex.InnerException.Source}</color>::<color=#3493eb>{ex.InnerException.GetType().Name}</color> => <color=#3493eb>{ex.InnerException.Message}</color>\n<color=yellow>{ex.InnerException.StackTrace}</color>");
+                UnityEngine.Debug.Log($"{ex.InnerException.Source}::{ex.InnerException.GetType().Name} => {ex.InnerException.Message}\n{ex.InnerException.StackTrace}");
+            }
+        }
 
         /// <summary>
         /// Checks whether the console is enabled or not.

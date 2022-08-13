@@ -15,6 +15,7 @@
             ZazaConsole.WriteLine("UNLOADING..");
             {
                 ZazaConsole.RemoveCommands();
+                ScriptHandler.UnloadScripts();
             } ZazaConsole.WriteLine("UNLOADED!");
 
             GameObject.Destroy(Load);

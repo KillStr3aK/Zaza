@@ -1,13 +1,11 @@
 ﻿namespace Zaza
 {
     using System;
-    using System.IO;
-    using System.Reflection;
     using System.Threading.Tasks;
 
     using UnityEngine;
 
-    internal sealed partial class Zaza : MonoBehaviour
+    internal sealed class Zaza : MonoBehaviour
     {
         void Awake()
         {
@@ -19,7 +17,7 @@
             try
             {
                 // Any code that may throw
-                PluginManager.LoadPlugins();
+                ScriptHandler.LoadScriptsFromDirectory("Zaza/Scripts");
             } catch (Exception ex)
             {
                 ZazaConsole.Exception(ex);

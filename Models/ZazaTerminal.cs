@@ -4,7 +4,7 @@
 
     using static Terminal;
 
-    internal abstract class ZazaTerminal
+    public abstract class ZazaTerminal
     {
         /// <summary>
         /// <see cref="Terminal"/> instance.
