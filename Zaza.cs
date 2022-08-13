@@ -6,6 +6,7 @@
 
     using UnityEngine;
 
+    using global::Zaza.SDK;
     using static MessageHud;
 
     internal sealed partial class Zaza : MonoBehaviour

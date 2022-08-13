@@ -67,10 +67,10 @@
     <Compile Include="Models\Extensions\ConsoleEventArgsExtensions.cs" />
     <Compile Include="Models\Extensions\PlayerExtensions.cs" />
     <Compile Include="Models\Extensions\TerminalExtensions.cs" />
-    <Compile Include="Models\PrefabList.cs" />
-    <Compile Include="Models\PrefabManager.cs" />
+    <Compile Include="Models\SDK\PrefabList.cs" />
+    <Compile Include="Models\SDK\PrefabManager.cs" />
     <Compile Include="Models\ScriptingEnvironment.cs" />
-    <Compile Include="Models\DLCManager.cs" />
+    <Compile Include="Models\SDK\DLCManager.cs" />
     <Compile Include="Models\ZazaVersion.cs" />
     <Compile Include="MonoLoader.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

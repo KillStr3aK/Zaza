@@ -1,4 +1,4 @@
-﻿namespace Zaza
+﻿namespace Zaza.SDK
 {
     using System;
     using System.IO;
