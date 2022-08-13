@@ -40,10 +40,7 @@
         /// <para><![CDATA[ <color=#FC0303>text</color> ]]></para>
         /// </param>
         public static void WriteLine(string text)
-        {
-            Instance.AddString($"<color=#73fc03>[ZAZA]</color> {text}");
-            Instance.Update();
-        }
+            => Instance.AddString($"<color=#73fc03>[ZAZA]</color> {text}");
 
         /// <summary>
         /// Checks whether the chat dialog is visible or not.
