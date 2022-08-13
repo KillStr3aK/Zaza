@@ -138,7 +138,7 @@
 
         public void Dispose()
         {
-            AppDomain.Unload(this.AppDomain);
+            // AppDomain.Unload(this.AppDomain);
 
             this.AppDomain = null;
             this.ScriptManager = null;
