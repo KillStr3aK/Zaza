@@ -1,5 +1,8 @@
 ﻿namespace Zaza
 {
+    using System;
+    using System.IO;
+    using System.Reflection;
     using System.Threading.Tasks;
 
     using UnityEngine;
@@ -11,6 +14,20 @@
             ZazaConsole.WriteLine($"Injected version: <color=yellow>{ZazaVersion.GetCheatVersion()}</color>");
             ZazaConsole.WriteLine("Developers: <color=purple>Nexd @ Eternar</color>");
 
+            Zaza.RegisterCommands();
+
+            try
+            {
+                // Any code that may throw
+                PluginManager.LoadPlugins();
+            } catch (Exception ex)
+            {
+                ZazaConsole.Exception(ex);
+            }
+        }
+
+        private static void RegisterCommands()
+        {
             ZazaConsole.RegisterCommand("quit", "Quit from the game.", async (args) =>
             {
                 args.Reply("helo :D");

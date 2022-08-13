@@ -4,7 +4,7 @@
 
     using static MessageHud;
 
-    internal static class HUD
+    public static class HUD
     {
         public static void ShowBiomeFoundMsg(string text, bool playStinger = false)
         {

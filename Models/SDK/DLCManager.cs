@@ -6,7 +6,7 @@
 
     using static DLCMan;
 
-    internal sealed class DLCManager
+    public sealed class DLCManager
     {
         public static bool IsDLCInstalled(DLCInfo dlcInfo)
             => Pumped.Invoke<bool, DLCMan>(DLCMan.instance, "IsDLCInstalled", dlcInfo);

@@ -3,6 +3,7 @@
 namespace Nexd.Reflection
 {
     using System;
+    using System.Collections.Generic;
     using System.Linq;
     using System.Reflection;
 
@@ -103,6 +104,12 @@ namespace Nexd.Reflection
         /// <returns><see cref="Assembly"/> if found, otherwise <see langword="null"/></returns>
         public static Assembly? GetAssembly(string name)
             => AppDomain.CurrentDomain.GetAssemblies().ToList().Find(x => x.GetName().Name == name);
+
+        public static IEnumerable<Type> FindDerivedTypes(Assembly assembly, Type baseType)
+            => assembly.GetTypes().Where(t => baseType.IsAssignableFrom(t));
+
+        public static Type FindDerivedType(Assembly assembly, Type baseType)
+            => FindDerivedTypes(assembly, baseType).First();
     }
 }
 

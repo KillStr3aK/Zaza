@@ -6,12 +6,12 @@
 
     using UnityEngine;
 
-    internal sealed class PrefabManager
+    public sealed class PrefabManager
     {
         /// <summary>
         /// Dump prefabs to file.
         /// </summary>
-        public static void Dump(string path)
+        internal static void Dump(string path)
         {
             PrefabList prefabs = GetPrefabs();
 

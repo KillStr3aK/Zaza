@@ -6,7 +6,7 @@
 
     using UnityEngine;
 
-    internal class PrefabList : Dictionary<int, GameObject>
+    public class PrefabList : Dictionary<int, GameObject>
     {
         public PrefabList(Dictionary<int, GameObject> prefabCollection)
         {
@@ -16,7 +16,7 @@
             }
         }
 
-        public void Dump(string path)
+        internal void Dump(string path)
         {
             try
             {

@@ -1,65 +1,90 @@
-﻿/*
-namespace Zaza
+﻿namespace Zaza
 {
     using System;
     using System.IO;
-    using System.Linq;
+    using System.Reflection;
     using System.Collections.Generic;
 
-    using Microsoft.CodeAnalysis.Scripting;
-    using Microsoft.CodeAnalysis.CSharp.Scripting;
+    using Nexd.Reflection;
 
-    internal class ScriptContext<T>
+    internal static class PluginManager
     {
-#nullable enable
-        public Script<T>? Script { get; set; } = null;
+        private static AppDomain AppDomain { get; set; }
 
-        public ScriptState<T>? State { get; set; } = null;
-#nullable disable
+        private static Dictionary<string, ZazaPlugin> Plugins { get; set; } = new Dictionary<string, ZazaPlugin>();
 
-        public void Compile()
-            => this.Script.Compile();
+        public static void CreateEnvironment()
+            => AppDomain = AppDomain.CurrentDomain;
 
-        public void RunAsync(object globals = null)
-            => this.State = this.Script.RunAsync(globals).Result;
-    }
-
-    internal static class ScriptingEnvironment
-    {
-        public static Dictionary<string, ScriptContext<object>> Scripts { get; set; } = new Dictionary<string, ScriptContext<object>>();
-
-#nullable enable
-        public static ScriptContext<object>? Create(string name, string path)
-#nullable disable
+        public static void LoadPlugins()
         {
-            if(!File.Exists(path))
+            if (!Directory.Exists("Zaza"))
             {
-                ZazaConsole.Error($"Script file not found at path \"{path}\"");
-                return null;
+                return;
             }
 
-            string code = File.ReadAllText(path);
-
-            ScriptOptions options = ScriptOptions.Default
-                .WithImports
-                (
-                    "System",
-                    "System.Linq",
-                    "System.Threading.Tasks",
-                    "System.Collections.Generic",
-                    "Zaza"
-                )
-                .WithReferences(AppDomain.CurrentDomain.GetAssemblies()
-                    .Where(x => !x.IsDynamic && !string.IsNullOrWhiteSpace(x.Location)));
-
-            ScriptContext<object> ctx = new ScriptContext<object>
+            foreach (string filePath in Directory.GetFiles("Zaza"))
             {
-                Script = CSharpScript.Create(code, options)
-            };
-
-            Scripts[name] = ctx;
-            return ctx;
+                ZazaConsole.WriteLine($"Loading plugin from {filePath}...");
+                Assembly assembly = Assembly.LoadFrom(filePath);
+                AssemblyName assemblyName = assembly.GetName();
+                Plugins[assemblyName.Name] = new ZazaPlugin(assembly, assemblyName);
+            }
         }
     }
+
+    public enum PluginState : uint
+    {
+        Unknown = 0x0,
+
+        Loading = 0x1,
+
+        Failed = 0x2,
+
+        Loaded = 0x3
+    }
+
+    public class ZazaPlugin
+    {
+        internal Assembly Assembly { get; set; }
+
+        internal AssemblyName AssemblyName { get; set; }
+
+        public PluginState State { get; set; } = PluginState.Unknown;
+
+        internal ZazaPlugin(Assembly assembly, AssemblyName assemblyName)
+        {
+            this.Assembly = assembly;
+            this.AssemblyName = assemblyName;
+
+            this.Initialize();
+        }
+
+        public string GetName()
+            => this.AssemblyName.Name;
+
+#nullable enable
+        internal void Initialize()
+        {
+            this.State = PluginState.Loading;
+
+            Type? type = Pumped.FindDerivedType(this.Assembly, typeof(ZazaPlugin));
+            if(type == null)
+            {
+                this.State = PluginState.Failed;
+                throw new PluginException($"Plugin {this.GetName()} does not have any class that inherits from 'ZazaPlugin'.");
+            }
+
+            MethodInfo? methodInfo = type.GetMethod("OnPluginStart");
+            if(methodInfo == null)
+            {
+                this.State = PluginState.Failed;
+                throw new PluginException($"Plugin {this.GetName()} does not implement OnPluginStart method.");
+            }
+
+            object instance = Activator.CreateInstance(type);
+            this.State = (PluginState)methodInfo.Invoke(instance, null);
+        }
+#nullable disable
+    }
 }
-*/

@@ -4,7 +4,7 @@
 
     using UnityEngine;
 
-    internal static class Game
+    public static class Game
     {
         /// <summary>
         /// Get local <see cref="Player"/> instance.
