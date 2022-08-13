@@ -13,8 +13,7 @@
 
             ZazaConsole.RegisterCommand("quit", "Quit from the game.", async (args) =>
             {
-                ZazaConsole.WriteLine("helo :D");
-
+                args.Reply("helo :D");
                 await Task.Delay(500);
                 Application.Quit();
             });

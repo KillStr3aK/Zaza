@@ -44,6 +44,7 @@
       <HintPath>C:\Program Files (x86)\Steam\steamapps\common\Valheim\valheim_Data\Managed\assembly_valheim.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="Microsoft.CSharp" />
     <Reference Include="UnityEngine">
       <HintPath>C:\Program Files (x86)\Steam\steamapps\common\Valheim\valheim_Data\Managed\UnityEngine.dll</HintPath>
       <Private>False</Private>
@@ -83,9 +84,6 @@
     <Compile Include="Models\ZazaTerminal.cs" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="DynamicLua">
-      <Version>1.1.2</Version>
-    </PackageReference>
     <PackageReference Include="System.ComponentModel">
       <Version>4.3.0</Version>
     </PackageReference>
