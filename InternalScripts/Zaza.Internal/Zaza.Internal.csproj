@@ -7,8 +7,8 @@
     <ProjectGuid>{57F84B3E-60BD-4CBD-85DB-72015397C4E1}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>ZazaScriptTemplate</RootNamespace>
-    <AssemblyName>ZazaScriptTemplate</AssemblyName>
+    <RootNamespace>Zaza.Internal</RootNamespace>
+    <AssemblyName>Zaza.Internal</AssemblyName>
     <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
@@ -57,8 +57,10 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ZazaInternal.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Script.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Properties\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

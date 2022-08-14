@@ -5,7 +5,7 @@ VisualStudioVersion = 17.4.32804.182
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Zaza", "Zaza.csproj", "{ED70FE71-0BBD-4598-AAD1-1E556D8E49D0}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Zaza.Internal", "InternalScripts\ZazaScriptTemplate\Zaza.Internal.csproj", "{57F84B3E-60BD-4CBD-85DB-72015397C4E1}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Zaza.Internal", "InternalScripts\Zaza.Internal\Zaza.Internal.csproj", "{57F84B3E-60BD-4CBD-85DB-72015397C4E1}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
