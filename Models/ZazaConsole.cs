@@ -162,30 +162,64 @@
         public static bool IsVisible()
             => Console.IsVisible();
 
+        /// <summary>
+        /// Sets font size for this <see cref="Terminal"/>
+        /// </summary>
+        /// <param name="size">Font size you want to use</param>
         public static void SetFontSize(int size)
             => Instance.SetFontSizeInternal(size);
 
+        /// <summary>
+        /// Gets the font size of this <see cref="Terminal"/>
+        /// </summary>
+        /// <returns>Font size</returns>
         public static int GetFontSize()
             => Instance.GetFontSizeInternal();
 
+        /// <summary>
+        /// Sets font color for this <see cref="Terminal"/>
+        /// </summary>
+        /// <param name="color"></param>
         public static void SetFontColor(Color color)
             => Instance.SetFontColorInternal(color);
 
+        /// <summary>
+        /// Gets the font color of this <see cref="Terminal"/>
+        /// </summary>
+        /// <returns></returns>
         public static Color GetFontColor()
             => Instance.GetFontColorInternal();
 
+        /// <summary>
+        /// Opens this <see cref="Terminal"/>
+        /// </summary>
         public static void Open()
             => Instance.OpenInternal();
 
+        /// <summary>
+        /// Closes this <see cref="Terminal"/>
+        /// </summary>
         public static void Close()
             => Instance.CloseInternal();
 
+        /// <summary>
+        /// Clear <see cref="Terminal"/> buffer
+        /// </summary>
         public static void Clear()
             => Instance.ClearInternal();
 
+        /// <summary>
+        /// Checks whether the cheats are enabled or not.
+        /// </summary>
+        /// <returns><see langword="true"/> if the cheats are enabled, <see langword="false"/> otherwise</returns>
         public static bool IsCheatsEnabled()
             => Instance.IsCheatsEnabledInternal();
 
+        /// <summary>
+        /// Checks whether the given command is allowed or not.
+        /// </summary>
+        /// <param name="command">Command you want to check</param>
+        /// <returns><see langword="true"/> if the command is allowed, <see langword="false"/> otherwise</returns>
         public static bool IsAllowedCommand(ConsoleCommand command)
             => Instance.IsAllowedCommandInternal(command);
 

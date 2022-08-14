@@ -107,7 +107,7 @@ namespace Zaza
     }
 
     /// <summary>
-    /// Scripting environment that handles assembly loading
+    /// Scripting environment that handles <see cref="System.AppDomain"/>
     /// </summary>
     internal class ScriptRuntime : IDisposable
     {
@@ -428,6 +428,9 @@ namespace Zaza
             => this.AssemblyName.Name;
     }
 
+    /// <summary>
+    /// Base class for scripts that runs in the environment.
+    /// </summary>
     public abstract class Script
     {
         internal ScriptContext Context { get; set; } = null;
@@ -449,6 +452,10 @@ namespace Zaza
             { }
 #endif
 
+        /// <summary>
+        /// Gets current script name.
+        /// </summary>
+        /// <returns>Current script name</returns>
         protected string GetScriptName()
             => this.Context.GetName();
 
