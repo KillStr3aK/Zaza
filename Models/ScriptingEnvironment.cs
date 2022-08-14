@@ -1,4 +1,7 @@
-﻿namespace Zaza
+﻿/// Unity does not really likes multiple AppDomain instances, correct unloading is unavailable.
+#define UNITY
+
+namespace Zaza
 {
     using System;
     using System.IO;
@@ -54,6 +57,7 @@
             scriptRuntime.RunScript(scriptFile);
         }
 
+//#if !UNITY
         public static void UnloadScript(string scriptFile)
         {
             string scriptName = Path.GetFileNameWithoutExtension(scriptFile);
@@ -65,6 +69,16 @@
             } else
             {
                 throw new FileNotFoundException("File not found at given path.");
+            }
+        }
+
+        public static void UnloadScripts()
+        {
+            var runtimes = ScriptRuntime.GetScriptRuntimes();
+
+            foreach (var runtime in runtimes)
+            {
+                ScriptHandler.UnloadScript(runtime.Value);
             }
         }
 
@@ -87,18 +101,12 @@
                 ZazaConsole.Exception(ex);
             }
         }
-
-        public static void UnloadScripts()
-        {
-            var runtimes = ScriptRuntime.GetScriptRuntimes();
-
-            foreach (var runtime in runtimes)
-            {
-                ScriptHandler.UnloadScript(runtime.Value);
-            }
-        }
+//#endif
     }
 
+    /// <summary>
+    /// Scripting environment that handles 
+    /// </summary>
     internal class ScriptRuntime : IDisposable
     {
         private static Dictionary<int, ScriptRuntime> ScriptRuntimes { get; set; } = new Dictionary<int, ScriptRuntime>();
@@ -126,10 +134,10 @@
         {
             try
             {
-                /* Unity does not really likes multiple domains
+#if !UNITY
                 this.AppDomain = AppDomain.CreateDomain($"ScriptDomain_{this.GetInstanceID()}", AppDomain.CurrentDomain.Evidence, new AppDomainSetup() { ApplicationBase = AppDomain.CurrentDomain.BaseDirectory });
                 this.ScriptManager = (ScriptManager)this.AppDomain.CreateInstanceAndUnwrap(typeof(ScriptManager).Assembly.FullName, typeof(ScriptManager).FullName);
-                */
+#endif
 
                 this.ScriptManager = new ScriptManager(this);
                 ScriptRuntimes.Add(this.InstanceID, this);
@@ -167,7 +175,9 @@
 
         public void Dispose()
         {
-            // AppDomain.Unload(this.AppDomain);
+#if !UNITY
+            AppDomain.Unload(this.AppDomain);
+#endif
 
             if(this.IsValid())
             {
@@ -178,8 +188,20 @@
             if(ScriptRuntimes.ContainsKey(this.InstanceID))
                 ScriptRuntimes.Remove(this.InstanceID);
         }
+
+        public static void Tick()
+        {
+            foreach(var runtime in ScriptRuntimes)
+            {
+                runtime.Value.ScriptManager.Tick();
+            }
+        }
     }
 
+    /// <summary>
+    /// <see cref="Script"/> <see cref="Assembly"/> loader.
+    /// <para>Regardless of <see langword="static"/> or not, they're intended to be used in a different <see cref="AppDomain"/></para>
+    /// </summary>
     internal class ScriptManager : MarshalByRefObject
     {
         private static readonly List<Script> Scripts = new List<Script>();
@@ -192,14 +214,18 @@
 
         private ScriptRuntime ScriptRuntime;
 
+#if !UNITY
         // actually, domain-global
-        // internal static ScriptManager GlobalManager { get; set; }
+        internal static ScriptManager GlobalManager { get; set; }
+#endif
 
         public ScriptManager(ScriptRuntime scriptRuntime)
         {
+#if !UNITY
+            GlobalManager = this;
+#endif
             this.InstanceID = Random.Next();
             this.ScriptRuntime = scriptRuntime;
-            // GlobalManager = this;
 
             Thread.CurrentThread.CurrentCulture = CultureInfo.InvariantCulture;
             Thread.CurrentThread.CurrentUICulture = CultureInfo.InvariantCulture;
@@ -246,7 +272,7 @@
                     {
                         try
                         {
-                            ZazaConsole.WriteLine($"Instantiating script instance.. {type.FullName}");
+                            ZazaConsole.WriteLine($"Instantiating script instance {type.FullName}");
 
                             Script derivedScript = Activator.CreateInstance(type) as Script;
                             derivedScript.Context = new ScriptContext(assembly, scriptManager);

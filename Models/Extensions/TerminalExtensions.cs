@@ -1,5 +1,5 @@
 ﻿namespace Zaza
 {
-    internal static class TerminalExtensions
+    public static class TerminalExtensions
         { }
 }

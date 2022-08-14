@@ -2,7 +2,7 @@
 {
     using Nexd.Reflection;
 
-    internal static class PlayerExtensions
+    public static class PlayerExtensions
     {
         public static void SetComfortLevel(this Player player, int comfortLevel)
             => Pumped.SetFieldValue<Player, int>(player, "m_comfortLevel", comfortLevel);

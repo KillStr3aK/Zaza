@@ -38,7 +38,7 @@
                 return;
             }
 
-            string path = "\\Zaza\\Scripts\\" + args[1].ToString() + ".dll";
+            string path = AppDomain.CurrentDomain.BaseDirectory + "\\Zaza\\Scripts\\" + args[1].ToString() + ".dll";
 
             try
             {
@@ -47,29 +47,6 @@
             {
                 args.ReplyError(ex.Message);
             } catch (BadImageFormatException ex)
-            {
-                args.ReplyError(ex.Message);
-            } catch (Exception ex)
-            {
-                ZazaConsole.Exception(ex);
-            }
-        }
-
-        public static void UnloadScript(ConsoleEventArgs args)
-        {
-            if (args.Length != 2)
-            {
-                args.ReplyError("Syntax Error: /unload_script [filename]");
-                return;
-            }
-
-            string path = "\\Zaza\\Scripts\\" + args[1].ToString() + ".dll";
-
-            try
-            {
-                ScriptHandler.UnloadScript(path);
-            }
-            catch (FileNotFoundException ex)
             {
                 args.ReplyError(ex.Message);
             } catch (Exception ex)

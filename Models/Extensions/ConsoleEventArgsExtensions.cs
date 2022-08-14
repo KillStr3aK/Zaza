@@ -5,7 +5,7 @@
 
     using static Terminal;
 
-    internal static class ConsoleEventArgsExtensions
+    public static class ConsoleEventArgsExtensions
     {
         /// <inheritdoc cref="ZazaConsole.WriteLine"/>
         public static void Reply(this ConsoleEventArgs args, string text)

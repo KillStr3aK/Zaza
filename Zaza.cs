@@ -24,6 +24,11 @@
             }
         }
 
+        void Update()
+        {
+            ScriptRuntime.Tick();
+        }
+
         private static void RegisterCommands()
         {
             ZazaConsole.RegisterCommand("quit", "Quit from the game.", async (args) =>
