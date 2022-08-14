@@ -141,23 +141,23 @@
                 return;
             }
 
+            if (int.TryParse(args[2], out int amount) && amount < 1 || amount > 100)
+            {
+                args.ReplyError("Amount must be number and should be between 1 - 100");
+                return;
+            }
+
+            if (int.TryParse(args[3], out int level) && level < 1 || level > 5)
+            {
+                args.ReplyError("Level must be number and should be between 1 - 5");
+                return;
+            }
+
+            Player localPlayer = Game.GetLocalPlayer();
+            DateTime now = DateTime.Now;
+
             try
             {
-                if (int.TryParse(args[2], out int amount) && amount < 1 || amount > 100)
-                {
-                    args.ReplyError("Amount must be number and should be between 1 - 100");
-                    return;
-                }
-
-                if (int.TryParse(args[3], out int level) && level < 1 || level > 5)
-                {
-                    args.ReplyError("Level must be number and should be between 1 - 5");
-                    return;
-                }
-
-                Player localPlayer = Game.GetLocalPlayer();
-                DateTime now = DateTime.Now;
-
                 for (int i = 0; i < amount; i++)
                 {
                     GameObject spawnedPrefab = PrefabManager.SpawnPrefab(prefabObject, localPlayer.transform.position + localPlayer.transform.forward * 2.0f + Vector3.up + (UnityEngine.Random.insideUnitSphere * 0.5f), Quaternion.identity);
