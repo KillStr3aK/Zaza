@@ -54,10 +54,13 @@
     </Reference>
     <Reference Include="Zaza">
       <HintPath>..\..\bin\Debug\Zaza.dll</HintPath>
+      <Private>False</Private>
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Commands.cs" />
     <Compile Include="Script.cs" />
+    <Compile Include="Settings.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Properties\" />

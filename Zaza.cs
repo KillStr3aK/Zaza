@@ -1,7 +1,6 @@
 ﻿namespace Zaza
 {
     using System;
-    using System.Threading.Tasks;
 
     using UnityEngine;
 
@@ -9,10 +8,10 @@
     {
         void Awake()
         {
+            ZazaConsole.SetFontSize(12);
+
             ZazaConsole.WriteLine($"Injected version: <color=yellow>{ZazaVersion.GetCheatVersion()}</color>");
             ZazaConsole.WriteLine("Developers: <color=purple>Nexd @ Eternar</color>");
-
-            Zaza.RegisterCommands();
 
             try
             {
@@ -21,34 +20,22 @@
             } catch (Exception ex)
             {
                 ZazaConsole.Exception(ex);
+            } finally
+            {
+                // Code unrelated to script execution
+
+                Commands.Register();
+                ZazaConsole.WriteLine($"Registered <color=yellow>{ZazaConsole.Commands.Count}</color> commands.");
             }
         }
 
         void Update()
-        {
-            ScriptRuntime.Tick();
-        }
+            => ScriptRuntime.Update();
 
-        private static void RegisterCommands()
-        {
-            ZazaConsole.RegisterCommand("quit", "Quit from the game.", async (args) =>
-            {
-                args.Reply("helo :D");
-                await Task.Delay(500);
-                Application.Quit();
-            });
+        void FixedUpdate()
+            => ScriptRuntime.FixedUpdate();
 
-            ZazaConsole.RegisterCommand("prefab_dump", "[(Optional)filepath] Dump game prefabs.", Commands.PrefabDump);
-
-            ZazaConsole.RegisterCommand("load_script", "[filename] Run C# script.", Commands.LoadScript);
-
-            ZazaConsole.RegisterCommand("unlockdlc", "[(Optional)dlcname] Soft-Unlock the given DLC.", Commands.UnlockDLC);
-
-            ZazaConsole.RegisterCommand("prefab_spawn", "[name] [amount] [level] Spawn any game prefab. (Items, mobs, etc.)", Commands.PrefabSpawn);
-
-            ZazaConsole.RegisterCommand("kill_mobs", "[distance] [(Optional)maxamount] Kill entities", Commands.KillMobs);
-
-            ZazaConsole.WriteLine($"Registered <color=yellow>{ZazaConsole.Commands.Count}</color> commands.");
-        }
+        void LateUpdate()
+            => ScriptRuntime.LateUpdate();
     }
 }

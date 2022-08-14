@@ -3,9 +3,12 @@
     using UnityEngine;
 
     using Nexd.Reflection;
+    using static Terminal;
 
     public sealed class ZazaChat : ZazaTerminal
     {
+        private static readonly ZazaChat _instance = new ZazaChat();
+
         /// <summary>
         /// Gets the in-game <see cref="Chat.instance"/>.
         /// </summary>
@@ -20,9 +23,9 @@
                 }
 
                 // it should set the Terminal when we're in-game
-                if(Terminal == null)
+                if(_instance.Terminal == null)
                 {
-                    Terminal = GetTerminal();
+                    _instance.Terminal = GetTerminal();
                 }
 
                 return Chat.instance;
@@ -55,6 +58,33 @@
         /// <returns><see langword="true"/> if dialog is visible, otherwise <see langword="false"/></returns>
         public static bool IsDialogVisible(GameObject talker)
             => Instance.IsDialogVisible(talker);
+
+        public static void SetFontSize(int size)
+            => _instance.SetFontSizeInternal(size);
+
+        public static int GetFontSize()
+            => _instance.GetFontSizeInternal();
+
+        public static void SetFontColor(Color color)
+            => _instance.SetFontColorInternal(color);
+
+        public static Color GetFontColor()
+            => _instance.GetFontColorInternal();
+
+        public static void Open()
+            => _instance.OpenInternal();
+
+        public static void Close()
+            => _instance.CloseInternal();
+
+        public static void Clear()
+            => _instance.ClearInternal();
+
+        public static bool IsCheatsEnabled()
+            => _instance.IsCheatsEnabledInternal();
+
+        public static bool IsAllowedCommand(ConsoleCommand command)
+            => _instance.IsAllowedCommandInternal(command);
 
         /// <summary>
         /// Gets the <see cref="Chat"/> instance.

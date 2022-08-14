@@ -15,6 +15,15 @@
             => Player.m_localPlayer;
 #nullable disable
 
+        public static bool IsInGame()
+            => GetLocalPlayer() != null;
+
+        public static bool InLoadingScreen()
+        {
+            Player localPlayer = GetLocalPlayer();
+            return localPlayer == null || localPlayer.IsTeleporting();
+        } 
+
         /// <summary>
         /// Kill mobs in the given distance.
         /// </summary>
@@ -46,6 +55,21 @@
             }
 
             return amount;
+        }
+
+        public static void SetDebugMode(bool state)
+            => Player.m_debugMode = state;
+
+        public static void SetCameraFOV(float fov)
+        {
+            Camera mainCamera = Utils.GetMainCamera();
+            Camera[] components = mainCamera.GetComponentsInChildren<Camera>();
+
+            mainCamera.fieldOfView = fov;
+            foreach (var i in components)
+            {
+                i.fieldOfView = fov;
+            }
         }
     }
 }

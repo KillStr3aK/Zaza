@@ -19,7 +19,9 @@ namespace Zaza
         {
             if (!Directory.Exists(directoryPath))
             {
+#if DEBUG
                 ZazaConsole.WriteLine("Folder not found.");
+#endif
                 return;
             }
 
@@ -105,7 +107,7 @@ namespace Zaza
     }
 
     /// <summary>
-    /// Scripting environment that handles 
+    /// Scripting environment that handles assembly loading
     /// </summary>
     internal class ScriptRuntime : IDisposable
     {
@@ -189,6 +191,7 @@ namespace Zaza
                 ScriptRuntimes.Remove(this.InstanceID);
         }
 
+#if !UNITY
         public static void Tick()
         {
             foreach(var runtime in ScriptRuntimes)
@@ -196,6 +199,31 @@ namespace Zaza
                 runtime.Value.ScriptManager.Tick();
             }
         }
+#else
+        public static void Update()
+        {
+            foreach (var runtime in ScriptRuntimes)
+            {
+                runtime.Value.ScriptManager.OnUpdate();
+            }
+        }
+
+        public static void FixedUpdate()
+        {
+            foreach (var runtime in ScriptRuntimes)
+            {
+                runtime.Value.ScriptManager.OnFixedUpdate();
+            }
+        }
+
+        public static void LateUpdate()
+        {
+            foreach (var runtime in ScriptRuntimes)
+            {
+                runtime.Value.ScriptManager.OnLateUpdate();
+            }
+        }
+#endif
     }
 
     /// <summary>
@@ -343,6 +371,7 @@ namespace Zaza
         internal ScriptRuntime GetScriptRuntime()
             => this.ScriptRuntime;
 
+#if !UNITY
         public void Tick()
         {
             foreach(Script script in Scripts)
@@ -350,6 +379,31 @@ namespace Zaza
                 script.OnTick();
             }
         }
+#else
+        public void OnUpdate()
+        {
+            foreach (Script script in Scripts)
+            {
+                script.OnUpdate();
+            }
+        }
+
+        public void OnFixedUpdate()
+        {
+            foreach (Script script in Scripts)
+            {
+                script.OnFixedUpdate();
+            }
+        }
+
+        public void OnLateUpdate()
+        {
+            foreach (Script script in Scripts)
+            {
+                script.OnLateUpdate();
+            }
+        }
+#endif
     }
 
     internal class ScriptContext
@@ -379,8 +433,19 @@ namespace Zaza
         protected Player LocalPlayer
             => Game.GetLocalPlayer();
 
-        public virtual void OnTick()
+#if UNITY
+        public virtual void OnLateUpdate()
             { }
+
+        public virtual void OnFixedUpdate()
+            { }
+
+        public virtual void OnUpdate()
+            { }
+#else
+        public virtual OnTick()
+            { }
+#endif
 
         protected string GetScriptName()
             => this.Context.GetName();

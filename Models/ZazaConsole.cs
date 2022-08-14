@@ -3,10 +3,14 @@
     using Nexd.Reflection;
     using System.Collections.Generic;
 
+    using UnityEngine;
+
     using static Terminal;
 
     public sealed class ZazaConsole : ZazaTerminal
     {
+        private static readonly ZazaConsole Instance = null;
+
         /// <summary>
         /// Dictionary that contains commands that has been registered by the cheat.
         /// </summary>
@@ -19,7 +23,10 @@
         public readonly static Dictionary<string, ConsoleCommand> BuiltInCommands = Pumped.GetFieldValue<Dictionary<string, ConsoleCommand>, Terminal>("commands");
 
         static ZazaConsole()
-            => Terminal = GetTerminal();
+            => Instance = new ZazaConsole();
+
+        private ZazaConsole()
+            => this.Terminal = GetTerminal();
 
         /// <summary>
         /// Register a new command to the terminal.
@@ -154,6 +161,33 @@
         /// <returns><see langword="true"/> if the console is visible, otherwise <see langword="false"/></returns>
         public static bool IsVisible()
             => Console.IsVisible();
+
+        public static void SetFontSize(int size)
+            => Instance.SetFontSizeInternal(size);
+
+        public static int GetFontSize()
+            => Instance.GetFontSizeInternal();
+
+        public static void SetFontColor(Color color)
+            => Instance.SetFontColorInternal(color);
+
+        public static Color GetFontColor()
+            => Instance.GetFontColorInternal();
+
+        public static void Open()
+            => Instance.OpenInternal();
+
+        public static void Close()
+            => Instance.CloseInternal();
+
+        public static void Clear()
+            => Instance.ClearInternal();
+
+        public static bool IsCheatsEnabled()
+            => Instance.IsCheatsEnabledInternal();
+
+        public static bool IsAllowedCommand(ConsoleCommand command)
+            => Instance.IsAllowedCommandInternal(command);
 
         /// <summary>
         /// Gets the <see cref="Console"/> instance.

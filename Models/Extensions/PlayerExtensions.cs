@@ -1,5 +1,7 @@
 ﻿namespace Zaza
 {
+    using System.Collections.Generic;
+
     using Nexd.Reflection;
 
     public static class PlayerExtensions
@@ -38,6 +40,17 @@
         {
             hitData.SetAttacker(player);
             target.ApplyDamage(hitData, false, false);
+        }
+
+        public static void InstantEquipQueue(this Player player)
+        {
+            List<Player.EquipQueueData> queue = Pumped.GetFieldValue<List<Player.EquipQueueData>, Player>(player, "m_equipQueue");
+
+            foreach(Player.EquipQueueData queueData in queue)
+            {
+                queueData.m_duration = 0.0f;
+                queueData.m_time = 0.0f;
+            }
         }
     }
 }
