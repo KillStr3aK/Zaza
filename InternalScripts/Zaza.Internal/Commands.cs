@@ -160,11 +160,14 @@
 
                 for (int i = 0; i < amount; i++)
                 {
-                    Character characterComponent = PrefabManager.SpawnPrefab(prefabObject, localPlayer.transform.position + localPlayer.transform.forward * 2.0f + Vector3.up + (UnityEngine.Random.insideUnitSphere * 0.5f), Quaternion.identity).GetComponent<Character>();
-
-                    if (characterComponent != null && characterComponent & level > 1)
+                    GameObject spawnedPrefab = PrefabManager.SpawnPrefab(prefabObject, localPlayer.transform.position + localPlayer.transform.forward * 2.0f + Vector3.up + (UnityEngine.Random.insideUnitSphere * 0.5f), Quaternion.identity);
+                    
+                    if (spawnedPrefab != null && spawnedPrefab.TryGetComponent<Character>(out Character characterComponent))
                     {
-                        characterComponent.SetLevel(level);
+                        if (characterComponent & level > 1)
+                        {
+                            characterComponent.SetLevel(level);
+                        }
                     }
                 }
 

@@ -255,6 +255,7 @@ namespace Zaza
             this.InstanceID = Random.Next();
             this.ScriptRuntime = scriptRuntime;
 
+#if !UNITY
             Thread.CurrentThread.CurrentCulture = CultureInfo.InvariantCulture;
             Thread.CurrentThread.CurrentUICulture = CultureInfo.InvariantCulture;
 
@@ -268,6 +269,7 @@ namespace Zaza
 
                 return this.LoadScript(args.Name.Split(',')[0]);
             };
+#endif
         }
 
         private static Assembly CreateScriptInternal(ScriptManager scriptManager, string assemblyFile)
