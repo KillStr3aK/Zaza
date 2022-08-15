@@ -7,6 +7,9 @@ namespace Nexd.Reflection
     using System.Reflection;
     using System.Collections.Generic;
 
+    /// <summary>
+    /// Wrapper class for <see cref="System.Reflection"/>
+    /// </summary>
     public static class Pumped
     {
         /// <summary>
