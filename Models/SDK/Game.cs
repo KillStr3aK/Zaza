@@ -4,6 +4,8 @@
 
     using UnityEngine;
 
+    using Nexd.Reflection;
+
     public static class Game
     {
         /// <summary>
@@ -19,10 +21,7 @@
             => GetLocalPlayer() != null;
 
         public static bool InLoadingScreen()
-        {
-            Player localPlayer = GetLocalPlayer();
-            return localPlayer == null || localPlayer.IsTeleporting();
-        } 
+            => Pumped.Invoke<bool, ZNetScene>(ZNetScene.instance, "InLoadingScreen");
 
         /// <summary>
         /// Kill mobs in the given distance.
@@ -65,5 +64,13 @@
 
         public static void SetMinWaterDistance(float distance)
             => GameCamera.instance.m_minWaterDistance = distance;
+
+        public static void AddStatusEffect(string name, float distance = 10.0f)
+        {
+            if (!Game.IsInGame())
+                return;
+
+
+        }
     }
 }
