@@ -36,6 +36,18 @@
         public static void SetGuardianPowerCooldown(this Player player, float cooldown)
             => Pumped.SetFieldValue<Player, float>(player, "m_guardianPowerCooldown", cooldown);
 
+        public static void SetCanSwim(this Player player, bool state)
+            => player.m_canSwim = state;
+
+        public static void SetSwimDepth(this Player player, float depth)
+            => player.m_swimDepth = depth;
+
+        public static void SetSwimSpeed(this Player player, float speed)
+            => player.m_swimSpeed = speed;
+
+        public static void SetInteractDistance(this Player player, float distance)
+            => player.m_maxInteractDistance = distance;
+
         public static void Attack(this Player player, Character target, HitData hitData)
         {
             hitData.SetAttacker(player);

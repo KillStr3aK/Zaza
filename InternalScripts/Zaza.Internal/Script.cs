@@ -27,6 +27,7 @@
             localPlayer.SetComfortLevel(Settings.ComfortLevel);
             localPlayer.SetUnderRoofState(Settings.RoofState);
             localPlayer.SetNoPlacementCost(Settings.NoCost);
+            localPlayer.SetInteractDistance(Settings.InteractDistance);
 
             Game.SetCameraFOV(Settings.FOV);
 

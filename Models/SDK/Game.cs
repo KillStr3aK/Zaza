@@ -62,5 +62,8 @@
 
         public static void SetCameraFOV(float fov)
             => GameCamera.instance.m_fov = fov;
+
+        public static void SetMinWaterDistance(float distance)
+            => GameCamera.instance.m_minWaterDistance = distance;
     }
 }
