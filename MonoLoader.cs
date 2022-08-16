@@ -19,6 +19,7 @@
             } ZazaConsole.WriteLine("UNLOADED!");
 
             GameObject.Destroy(Load);
+            Load = null;
         }
 
         private static GameObject Load { get; set; } = null;
