@@ -62,15 +62,28 @@
         public static void SetCameraFOV(float fov)
             => GameCamera.instance.m_fov = fov;
 
-        public static void SetMinWaterDistance(float distance)
+        public static void SetCameraMinWaterDistance(float distance)
             => GameCamera.instance.m_minWaterDistance = distance;
 
-        public static void AddStatusEffect(string name, float distance = 10.0f)
+        public static void SetCameraMaxDistance(float distance)
+            => GameCamera.instance.m_maxDistance = distance;
+
+        public static void SetCameraMaxDistanceBoat(float distance)
+            => GameCamera.instance.m_maxDistanceBoat = distance;
+
+        public static void AddStatusEffect(string name, float range = 10.0f)
         {
             if (!Game.IsInGame())
                 return;
 
-
+            Player localPlayer = Game.GetLocalPlayer();
+            List<Player> playersInRange = new List<Player>();
+            Player.GetPlayersInRange(localPlayer.transform.position, range, playersInRange);
+            
+            foreach(Player player in playersInRange)
+            {
+                player.GetSEMan().AddStatusEffect(name, true);
+            }
         }
     }
 }
