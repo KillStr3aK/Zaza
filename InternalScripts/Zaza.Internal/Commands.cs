@@ -60,7 +60,7 @@
 
             ZazaConsole.RegisterCommand("fly_toggle", "[true | false | 1 | 0] Toggle fly mode.", Commands.ToggleFlyMode);
 
-            ZazaConsole.RegisterCommand("debug_toggle", "[true | false | 1 | 0] Toggle debug mode.", Commands.ToggleNoCost);
+            ZazaConsole.RegisterCommand("debug_toggle", "[true | false | 1 | 0] Toggle debug mode.", Commands.ToggleDebugMode);
 
             ZazaConsole.RegisterCommand("guardian_cooldown", "[true | false | 1 | 0] Toggle instant guardian cooldown.", Commands.ToggleGuardianCooldown);
 
