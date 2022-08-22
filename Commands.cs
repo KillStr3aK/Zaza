@@ -6,6 +6,8 @@
 
     using UnityEngine;
 
+    using Steamworks;
+
     using global::Zaza.SDK;
     using static Terminal;
 
@@ -27,8 +29,6 @@
             ZazaConsole.RegisterCommand("echo", "[text] Print to console", Commands.Echo);
 
             ZazaConsole.RegisterCommand("print", "[text] Print to console", Commands.Echo);
-
-            ZazaConsole.RegisterCommand("connect", "[ip:port] Connect to server IP:Port", Commands.Connect);
         }
 
         public static void PrefabDump(ConsoleEventArgs args)
@@ -85,17 +85,6 @@
             }
 
             args.Reply(buffer);
-        }
-
-        public static void Connect(ConsoleEventArgs args)
-        {
-            if (args.Length != 2)
-            {
-                args.ReplyError("Syntax Error: /connect [ip:port]");
-                return;
-            }
-
-
         }
     }
 }
