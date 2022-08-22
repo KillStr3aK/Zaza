@@ -1,6 +1,7 @@
 ﻿namespace Zaza
 {
     using System.Collections.Generic;
+    using global::Zaza.SDK;
 
     using Nexd.Reflection;
 
@@ -47,6 +48,9 @@
 
         public static void SetInteractDistance(this Player player, float distance)
             => player.m_maxInteractDistance = distance;
+
+        public static void AddStatusEffect(this Player player, string name, bool resetTime = false)
+            => player.GetSEMan().AddStatusEffect(name, resetTime);
 
         public static void Attack(this Player player, Character target, HitData hitData)
         {

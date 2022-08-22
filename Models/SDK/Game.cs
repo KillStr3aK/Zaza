@@ -82,7 +82,7 @@
             
             foreach(Player player in playersInRange)
             {
-                player.GetSEMan().AddStatusEffect(name, true);
+                player.AddStatusEffect(name, true);
             }
         }
     }
