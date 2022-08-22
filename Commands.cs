@@ -6,8 +6,6 @@
 
     using UnityEngine;
 
-    using Steamworks;
-
     using global::Zaza.SDK;
     using static Terminal;
 
