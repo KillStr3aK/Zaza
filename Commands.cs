@@ -29,6 +29,8 @@
             ZazaConsole.RegisterCommand("echo", "[text] Print to console", Commands.Echo);
 
             ZazaConsole.RegisterCommand("print", "[text] Print to console", Commands.Echo);
+
+            ZazaConsole.RegisterCommand("coords", "Get current position", Commands.GetCoords);
         }
 
         public static void PrefabDump(ConsoleEventArgs args)
@@ -85,6 +87,17 @@
             }
 
             args.Reply(buffer);
+        }
+
+        public static void GetCoords(ConsoleEventArgs args)
+        {
+            if (!Game.IsInGame())
+            {
+                args.ReplyError("You must be in-game.");
+                return;
+            }
+
+            args.Reply($"{Game.GetLocalPlayer().transform.position}");
         }
     }
 }
