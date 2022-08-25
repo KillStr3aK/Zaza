@@ -67,6 +67,10 @@
             ZazaConsole.RegisterCommand("guardian_start", "Force start guardian power.", Commands.ForceStartGuardianPower);
 
             ZazaConsole.RegisterCommand("food_puke", "Clear foods.", Commands.ClearFoods);
+
+            ZazaConsole.RegisterCommand("water_walk", "[true | false | 1 | 0] Toggle Walk on water.", Commands.ToggleWalkOnWater);
+
+            ZazaConsole.RegisterCommand("water_walk_under", "[true | false | 1 | 0] Toggle Walk under water.", Commands.ToggleWalkUnderWater);
         }
 
         public static void UnlockDLC(ConsoleEventArgs args)
@@ -627,6 +631,40 @@
             }
 
             args.Reply($"Instant guardian power has been changed to <color=yellow>{Settings.InstantGuardianPower}</color>");
+        }
+        
+        public static void ToggleWalkOnWater(ConsoleEventArgs args)
+        {
+            if (args.Length != 2)
+            {
+                args.ReplyError($"Usage: /water_walk [true | false | 1 | 0] Current value: {Settings.WalkOnWater}");
+                return;
+            }
+
+            if (!bool.TryParse(args[1], out Settings.WalkOnWater))
+            {
+                args.ReplyError("Parameter 1 is invalid!");
+                return;
+            }
+
+            args.Reply($"Walk on Water has been changed to <color=yellow>{Settings.WalkOnWater}</color>");
+        }
+        
+        public static void ToggleWalkUnderWater(ConsoleEventArgs args)
+        {
+            if (args.Length != 2)
+            {
+                args.ReplyError($"Usage: /water_walk_under [true | false | 1 | 0] Current value: {Settings.WalkUnderWater}");
+                return;
+            }
+
+            if (!bool.TryParse(args[1], out Settings.WalkUnderWater))
+            {
+                args.ReplyError("Parameter 1 is invalid!");
+                return;
+            }
+
+            args.Reply($"Walk on Water has been changed to <color=yellow>{Settings.WalkUnderWater}</color>");
         }
 
         public static void ForceStartGuardianPower(ConsoleEventArgs args)

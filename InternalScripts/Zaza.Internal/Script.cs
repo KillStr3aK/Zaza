@@ -46,6 +46,18 @@
                 localPlayer.SetGuardianPowerCooldown(0.0f);
             }
 
+            if (Settings.WalkUnderWater)
+            {
+                localPlayer.SetCanSwim(false);
+                localPlayer.SetSwimDepth(100.0f);
+
+                Game.SetCameraMinWaterDistance(-100.0f);
+            } else if (Settings.WalkOnWater)
+            {
+                localPlayer.SetCanSwim(true);
+                localPlayer.SetSwimDepth(-0.5f);
+            }
+
             Inventory inventory = localPlayer.GetInventory();
             List<ItemDrop.ItemData> inventoryItems = inventory.GetAllItems();
 

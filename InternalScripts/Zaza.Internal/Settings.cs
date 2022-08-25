@@ -37,5 +37,9 @@
         public static bool InstantGuardianPower;
 
         public static bool TeleportRestrict;
+
+        public static bool WalkOnWater;
+
+        public static bool WalkUnderWater;
     }
 }
