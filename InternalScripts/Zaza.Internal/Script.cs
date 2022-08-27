@@ -56,6 +56,9 @@
             {
                 localPlayer.SetCanSwim(true);
                 localPlayer.SetSwimDepth(-0.5f);
+            } else
+            {
+                localPlayer.SetSwimDepth(1.0f);
             }
 
             Inventory inventory = localPlayer.GetInventory();

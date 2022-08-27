@@ -14,6 +14,8 @@
 
         public static float PickupRange;
 
+        public static float SwimSpeed;
+
         public static int ComfortLevel;
 
         public static bool NoDurability;

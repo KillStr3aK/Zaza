@@ -71,6 +71,8 @@
             ZazaConsole.RegisterCommand("water_walk", "[true | false | 1 | 0] Toggle Walk on water.", Commands.ToggleWalkOnWater);
 
             ZazaConsole.RegisterCommand("water_walk_under", "[true | false | 1 | 0] Toggle Walk under water.", Commands.ToggleWalkUnderWater);
+
+            ZazaConsole.RegisterCommand("swimspeed", "[speed] Set swim speed.", Commands.SetSwimSpeed);
         }
 
         public static void UnlockDLC(ConsoleEventArgs args)
@@ -397,6 +399,23 @@
             }
 
             args.Reply($"Interact distance has been changed to <color=yellow>{Settings.InteractDistance}</color>");
+        }
+        
+        public static void SetSwimSpeed(ConsoleEventArgs args)
+        {
+            if (args.Length != 2)
+            {
+                args.ReplyError($"Usage: /swimspeed [speed] Current value: {Settings.SwimSpeed}");
+                return;
+            }
+
+            if (!float.TryParse(args[1], out Settings.SwimSpeed) && Settings.SwimSpeed > 0.0f)
+            {
+                args.ReplyError("Parameter 1 is invalid!");
+                return;
+            }
+
+            args.Reply($"Swim speed has been changed to <color=yellow>{Settings.SwimSpeed}</color>");
         }
         
         public static void SetCameraShake(ConsoleEventArgs args)
