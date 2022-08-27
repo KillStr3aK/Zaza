@@ -18,7 +18,7 @@
 #nullable disable
 
         public static bool IsInGame()
-            => GetLocalPlayer() != null;
+            => GetLocalPlayer() != null && !InLoadingScreen();
 
         public static bool InLoadingScreen()
             => Pumped.Invoke<bool, ZNetScene>(ZNetScene.instance, "InLoadingScreen");
