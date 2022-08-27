@@ -53,8 +53,10 @@
       <HintPath>C:\Program Files (x86)\Steam\steamapps\common\Valheim\valheim_Data\Managed\UnityEngine.CoreModule.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="UnityEngine.IMGUIModule">
+    <Reference Include="UnityEngine.IMGUIModule, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>C:\Program Files (x86)\Steam\steamapps\common\Valheim\valheim_Data\Managed\UnityEngine.IMGUIModule.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="UnityEngine.InputLegacyModule">
       <HintPath>C:\Program Files (x86)\Steam\steamapps\common\Valheim\valheim_Data\Managed\UnityEngine.InputLegacyModule.dll</HintPath>
@@ -79,6 +81,7 @@
     <Compile Include="Models\SDK\PrefabManager.cs" />
     <Compile Include="Models\ScriptingEnvironment.cs" />
     <Compile Include="Models\SDK\DLCManager.cs" />
+    <Compile Include="Models\ZazaGUI.cs" />
     <Compile Include="Models\ZazaVersion.cs" />
     <Compile Include="MonoLoader.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

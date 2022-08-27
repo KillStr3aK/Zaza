@@ -37,5 +37,8 @@
 
         void LateUpdate()
             => ScriptRuntime.LateUpdate();
+
+        void OnGUI()
+            => ZazaGUI.Render();
     }
 }
