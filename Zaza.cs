@@ -10,7 +10,7 @@
         {
             ZazaConsole.SetFontSize(12);
 
-            ZazaConsole.WriteLine($"Injected version: <color=yellow>{ZazaVersion.GetCheatVersion()}</color>");
+            ZazaConsole.WriteLine($"Injected version: <color=yellow>{ZazaAssembly.GetCheatVersion()}</color>");
             ZazaConsole.WriteLine("Developers: <color=purple>Nexd @ Eternar</color>");
 
             try
@@ -22,7 +22,7 @@
                 ZazaConsole.Exception(ex);
             } finally
             {
-                // Code unrelated to script execution
+                // Code that is unlikely to throw
 
                 Commands.Register();
                 ZazaConsole.WriteLine($"Registered <color=yellow>{ZazaConsole.Commands.Count}</color> commands.");

@@ -23,6 +23,9 @@
         public static bool InLoadingScreen()
             => Pumped.Invoke<bool, ZNetScene>(ZNetScene.instance, "InLoadingScreen");
 
+        public static string GetVersion()
+            => ZazaAssembly.GetGameVersion();
+
         /// <summary>
         /// Kill mobs in the given distance.
         /// </summary>

@@ -82,7 +82,7 @@
     <Compile Include="Models\ScriptingEnvironment.cs" />
     <Compile Include="Models\SDK\DLCManager.cs" />
     <Compile Include="Models\ZazaGUI.cs" />
-    <Compile Include="Models\ZazaVersion.cs" />
+    <Compile Include="Models\ZazaAssembly.cs" />
     <Compile Include="MonoLoader.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Zaza.cs" />

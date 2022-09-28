@@ -26,7 +26,7 @@
                     {
                         DateTime now = DateTime.Now;
 
-                        sw.WriteLine($"Valheim version: {ZazaVersion.GetGameVersion()} {now}");
+                        sw.WriteLine($"Valheim version: {ZazaAssembly.GetGameVersion()} {now}");
                         sw.WriteLine("HASH\t\tNAME");
 
                         foreach (var prefab in this)
